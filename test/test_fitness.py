@@ -28,9 +28,6 @@ class TestFitnessCaesar(unittest.TestCase):
         fitness_ciphertext = calculate_fitness("wkh txlfn eurzq ira mxpsv ryhu wkh odcb grj", "en")
         fitness_partialdecode = calculate_fitness("the wxlfn kurzq ira mxpsv ryhu the odcb grj", "en")
         fitness_plaintext = calculate_fitness("the quick brown fox jumps over the lazy dog")
-        print(str(fitness_ciphertext))
-        print(str(fitness_partialdecode))
-        print(str(fitness_plaintext))
         self.assertGreater(fitness_plaintext, fitness_partialdecode,
                            "the fitness of the partial decode is higher than the real text")
         self.assertGreater(fitness_partialdecode, fitness_ciphertext,

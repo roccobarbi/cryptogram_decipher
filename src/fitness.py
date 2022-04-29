@@ -11,7 +11,8 @@ def calculate_fitness(text, language="en"):
     bf = NgramFrequency(text=text, nvalue=2).calculate()
     fitness = 100
     for letter in lf:
-        fitness -= abs(data.letter_frequency_by_language[language][letter] - lf[letter]) * DIFF_AMPLIFICATION
+        if str(letter).isalpha():
+            fitness -= abs(data.letter_frequency_by_language[language][letter] - lf[letter]) * DIFF_AMPLIFICATION
     for bigram in bf:
         if bigram not in data.bigram_frequency_by_language[language].keys():
             fitness -= bf[bigram] * DIFF_AMPLIFICATION
