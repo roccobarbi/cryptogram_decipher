@@ -44,22 +44,22 @@ def iteration(ciphertext, language, alphabet, key_string):
     return plaintext, fitness, key_string
 
 
-def restart_cycle(text, alphabet, language):
+def restart_cycle(ciphertext, alphabet, language):
     key_list = list(alphabet)
     random.shuffle(key_list)
     key_string = ''.join([str(item) for item in key_list])
     key_dict = {}
     for i in range(len(alphabet)):
         key_dict[ALPHABET[i]] = key_string[i]
-    text = decode(text, key_dict)
-    fitness = calculate_fitness(text, language)
+    plaintext = decode(ciphertext, key_dict)
+    fitness = calculate_fitness(plaintext, language)
     for i in range(ITERATIONS):
-        text_temp, fitness_temp, key_string_temp = iteration(text, language, alphabet, key_string)
+        text_temp, fitness_temp, key_string_temp = iteration(ciphertext, language, alphabet, key_string)
         if fitness_temp > fitness:
-            text = text_temp
+            plaintext = text_temp
             fitness = fitness_temp
             key_string = key_string_temp
-    return text, fitness
+    return plaintext, fitness
 
 
 def main():
