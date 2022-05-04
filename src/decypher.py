@@ -1,6 +1,5 @@
 import random
 import argparse
-import sys
 
 from fitness import calculate_fitness
 
@@ -49,7 +48,7 @@ def iteration(ciphertext, language, alphabet, key_string, mode):
     return plaintext, fitness, key_string
 
 
-def restart_cycle(ciphertext, alphabet, language, mode):
+def restart_cycle(ciphertext, alphabet, language, mode, iterations=ITERATIONS):
     key_list = list(alphabet)
     random.shuffle(key_list)
     key_string = ''.join([str(item) for item in key_list])
@@ -58,7 +57,7 @@ def restart_cycle(ciphertext, alphabet, language, mode):
         key_dict[ALPHABET[i]] = key_string[i]
     plaintext = decode(ciphertext, key_dict)
     fitness = calculate_fitness(plaintext, language=language, mode=mode)
-    for i in range(ITERATIONS):
+    for i in range(iterations):
         text_temp, fitness_temp, key_string_temp = iteration(ciphertext, language, alphabet, key_string, mode)
         if fitness_temp < fitness:
             plaintext = text_temp
@@ -83,9 +82,9 @@ def main():
     args = argument_parser.parse_args()
     ciphertext = args.text.lower()
     results = {}
-    for tries in range(RESTARTS):
+    for tries in range(args.restarts):
         print(str(tries))
-        results[tries] = restart_cycle(ciphertext, args.alphabet, args.language, args.mode)
+        results[tries] = restart_cycle(ciphertext, args.alphabet, args.language, args.mode, iterations=args.iterations)
         print(str(tries) + ": " + str(results[tries][1]))
     final_result = None
     for result in range(len(results)):

@@ -9,6 +9,13 @@ DIFF_AMPLIFICATION = 15
 def fitness_aristocrat(text, language):
     lf = LetterFrequency(text).calculate()
     bf = NgramFrequency(text=text, nvalue=2).calculate()
+    short_words_weights = {
+        1: 3,
+        2: 2,
+        3: 1,
+        4: 1,
+        5: 2
+    }
     fitness = 0
     for letter in lf:
         if str(letter).isalpha():
@@ -21,7 +28,7 @@ def fitness_aristocrat(text, language):
     words = text.split()
     for word in words:
         if len(word) < 6 and word in data.frequent_short_words_by_language[language][len(word)]:
-            fitness -= 0.5
+            fitness -= 0.5 * short_words_weights[len(word)]
     return fitness
 
 
