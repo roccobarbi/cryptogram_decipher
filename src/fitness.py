@@ -14,7 +14,18 @@ def fitness_aristocrat(text, language):
         2: 2,
         3: 1,
         4: 1,
-        5: 2
+        5: 2,
+        6: 1,
+        7: 1,
+        8: 1,
+        9: 1,
+        10: 1,
+        11: 1,
+        12: 1,
+        13: 1,
+        14: 1,
+        15: 1,
+        16: 1
     }
     fitness = 0
     for letter in lf:
@@ -27,7 +38,7 @@ def fitness_aristocrat(text, language):
             fitness += abs(data.bigram_frequency_by_language[language][bigram] - bf[bigram]) * DIFF_AMPLIFICATION
     words = text.split()
     for word in words:
-        if len(word) < 6 and word in data.frequent_short_words_by_language[language][len(word)]:
+        if len(word) < 14 and word in data.frequent_short_words_by_language[language][len(word)]:
             fitness -= 0.5 * short_words_weights[len(word)]
     return fitness
 
