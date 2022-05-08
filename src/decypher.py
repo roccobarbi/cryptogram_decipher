@@ -31,38 +31,43 @@ def extract_two(length):
     return first, second
 
 
-def iteration(ciphertext, language, alphabet, key_string, mode):
+def invert_list_elements(input_list, first, second):
+    output = []
+    for element in input_list:
+        output.append(element)
+    output[first] = input_list[second]
+    output[second] = input_list[first]
+    return output
+
+
+def iteration(ciphertext, language, alphabet, key_list, mode):
     first, second = extract_two(len(alphabet))
-    temp_letter = key_string[first]
-    key_list = []
-    for letter in key_string:
-        key_list.append(letter)
-    key_list[first] = key_list[second]
-    key_list[second] = temp_letter
+    temp_keys = invert_list_elements(key_list, first, second)
     key_dict_temp = {}
     for i in range(len(alphabet)):
-        key_dict_temp[alphabet[i]] = key_list[i]
+        key_dict_temp[alphabet[i]] = temp_keys[i]
     plaintext = decode(ciphertext, key_dict_temp)
     fitness = calculate_fitness(plaintext, language=language, mode=mode)
-    key_string = ''.join([str(item) for item in key_list])
-    return plaintext, fitness, key_string
+    return plaintext, fitness, temp_keys
 
 
 def restart_cycle(ciphertext, alphabet, language, mode, iterations=ITERATIONS):
     key_list = list(alphabet)
     random.shuffle(key_list)
-    key_string = ''.join([str(item) for item in key_list])
     key_dict = {}
     for i in range(len(alphabet)):
-        key_dict[ALPHABET[i]] = key_string[i]
+        key_dict[ALPHABET[i]] = key_list[i]
     plaintext = decode(ciphertext, key_dict)
     fitness = calculate_fitness(plaintext, language=language, mode=mode)
+    changed = 0
     for i in range(iterations):
-        text_temp, fitness_temp, key_string_temp = iteration(ciphertext, language, alphabet, key_string, mode)
+        text_temp, fitness_temp, key_list_temp = iteration(ciphertext, language, alphabet, key_list, mode)
         if fitness_temp < fitness:
+            changed += 1
             plaintext = text_temp
             fitness = fitness_temp
-            key_string = key_string_temp
+            key_list = key_list_temp
+    print('Changed {} times'.format(changed))
     return plaintext, fitness
 
 
@@ -85,7 +90,7 @@ def main():
     for tries in range(args.restarts):
         print(str(tries))
         results[tries] = restart_cycle(ciphertext, args.alphabet, args.language, args.mode, iterations=args.iterations)
-        print(str(tries) + ": " + str(results[tries][1]))
+        print('{index:d}: {fitness:.5f}'.format(index=tries, fitness=results[tries][1]))
     final_result = None
     for result in range(len(results)):
         if final_result is None:
