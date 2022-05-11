@@ -22,7 +22,7 @@ class TestDecipher(unittest.TestCase):
                 'the head was a broad silver band nearly an inch across. “To James Mortimer, M.R.C.S., from his ' \
                 'friends of the C.C.H.,” was engraved upon it, with the date “1884.” It was just such a stick as ' \
                 'the old-fashioned family practitioner used to carry—dignified, solid, and reassuring.'
-        deciphered = decypher.decipher(50, 'abcdefghijklmnopqrstuvwxyz', 'en', 'a', 10000, False, ciphertext=text)
+        deciphered = decypher.decipher(50, 'abcdefghijklmnopqrstuvwxyz', 'en', 'a', 10000, text, False)
         self.assertTrue(deciphered, plain)
 
 
