@@ -1,7 +1,7 @@
 import random
 import argparse
 
-from fitness import calculate_fitness
+from .fitness import calculate_fitness
 
 
 RESTARTS = 5
