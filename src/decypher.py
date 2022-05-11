@@ -71,7 +71,8 @@ def restart_cycle(ciphertext, alphabet, language, mode, iterations=ITERATIONS):
     return plaintext, fitness
 
 
-def decipher(restarts, alphabet, language, mode, iterations, ciphertext, results):
+def decipher(restarts, alphabet, language, mode, iterations, ciphertext):
+    results = {}
     for tries in range(restarts):
         print(str(tries))
         results[tries] = restart_cycle(ciphertext, alphabet, language, mode, iterations=iterations)
