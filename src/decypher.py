@@ -71,6 +71,20 @@ def restart_cycle(ciphertext, alphabet, language, mode, iterations=ITERATIONS):
     return plaintext, fitness
 
 
+def decipher(restarts, alphabet, language, mode, iterations, ciphertext, results):
+    for tries in range(restarts):
+        print(str(tries))
+        results[tries] = restart_cycle(ciphertext, alphabet, language, mode, iterations=iterations)
+        print('{index:d}: {fitness:.5f}'.format(index=tries, fitness=results[tries][1]))
+    final_result = None
+    for result in range(len(results)):
+        if final_result is None:
+            final_result = results[result]
+        if results[result][1] < final_result[1]:
+            final_result = results[result]
+    return final_result
+
+
 def main():
     argument_parser = argparse.ArgumentParser()
     argument_parser.add_argument("--text", "-t", required=True, type=str, help="the text to be decrypted")
@@ -86,17 +100,13 @@ def main():
                                  choices=MODES.keys(), help="The type of cryptogram.")
     args = argument_parser.parse_args()
     ciphertext = args.text.lower()
-    results = {}
-    for tries in range(args.restarts):
-        print(str(tries))
-        results[tries] = restart_cycle(ciphertext, args.alphabet, args.language, args.mode, iterations=args.iterations)
-        print('{index:d}: {fitness:.5f}'.format(index=tries, fitness=results[tries][1]))
-    final_result = None
-    for result in range(len(results)):
-        if final_result is None:
-            final_result = results[result]
-        if results[result][1] < final_result[1]:
-            final_result = results[result]
+    final_result = decipher(
+        args.restarts,
+        args.alphabet,
+        args.language,
+        args.mode,
+        args.iterations,
+        ciphertext)
     print(final_result)
 
 
