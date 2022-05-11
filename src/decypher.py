@@ -13,8 +13,10 @@ MODES = {
 }
 
 
-def decode(text, key):
+def decode(text, key, sensitive):
     plaintext = []
+    if not sensitive:
+        text = text.lower()
     for character in text:
         if not str(character).isalpha():
             plaintext.append(character)
@@ -40,28 +42,28 @@ def invert_list_elements(input_list, first, second):
     return output
 
 
-def iteration(ciphertext, language, alphabet, key_list, mode):
+def iteration(ciphertext, language, alphabet, key_list, mode, sensitive):
     first, second = extract_two(len(alphabet))
     temp_keys = invert_list_elements(key_list, first, second)
     key_dict_temp = {}
     for i in range(len(alphabet)):
         key_dict_temp[alphabet[i]] = temp_keys[i]
-    plaintext = decode(ciphertext, key_dict_temp)
+    plaintext = decode(ciphertext, key_dict_temp, sensitive)
     fitness = calculate_fitness(plaintext, language=language, mode=mode)
     return plaintext, fitness, temp_keys
 
 
-def restart_cycle(ciphertext, alphabet, language, mode, iterations=ITERATIONS):
+def restart_cycle(ciphertext, alphabet, language, mode, sensitive, iterations=ITERATIONS):
     key_list = list(alphabet)
     random.shuffle(key_list)
     key_dict = {}
     for i in range(len(alphabet)):
         key_dict[ALPHABET[i]] = key_list[i]
-    plaintext = decode(ciphertext, key_dict)
+    plaintext = decode(ciphertext, key_dict, sensitive)
     fitness = calculate_fitness(plaintext, language=language, mode=mode)
     changed = 0
     for i in range(iterations):
-        text_temp, fitness_temp, key_list_temp = iteration(ciphertext, language, alphabet, key_list, mode)
+        text_temp, fitness_temp, key_list_temp = iteration(ciphertext, language, alphabet, key_list, mode, sensitive)
         if fitness_temp < fitness:
             changed += 1
             plaintext = text_temp
@@ -71,11 +73,11 @@ def restart_cycle(ciphertext, alphabet, language, mode, iterations=ITERATIONS):
     return plaintext, fitness
 
 
-def decipher(restarts, alphabet, language, mode, iterations, ciphertext):
+def decipher(restarts, alphabet, language, mode, iterations, ciphertext, sensitive):
     results = {}
     for tries in range(restarts):
         print(str(tries))
-        results[tries] = restart_cycle(ciphertext, alphabet, language, mode, iterations=iterations)
+        results[tries] = restart_cycle(ciphertext, alphabet, language, mode, sensitive, iterations=iterations)
         print('{index:d}: {fitness:.5f}'.format(index=tries, fitness=results[tries][1]))
     final_result = None
     for result in range(len(results)):
@@ -99,15 +101,21 @@ def main():
                                  help="the number of restart cycles")
     argument_parser.add_argument("--mode", "-m", required=False, type=str, default="a",
                                  choices=MODES.keys(), help="The type of cryptogram.")
+    argument_parser.add_argument("--sensitive", action='store_true', type=bool,
+                                 help="If set, it treats the text as case sensitive.")
     args = argument_parser.parse_args()
-    ciphertext = args.text.lower()
+    if args.sensitive:
+        ciphertext = args.text
+    else:
+        ciphertext = args.text.lower()
     final_result = decipher(
         args.restarts,
         args.alphabet,
         args.language,
         args.mode,
         args.iterations,
-        ciphertext)
+        ciphertext,
+        args.sensitive)
     print(final_result)
 
 
