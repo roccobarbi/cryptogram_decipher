@@ -47,7 +47,10 @@ def iteration(ciphertext, language, alphabet, key_list, mode):
     for i in range(len(alphabet)):
         key_dict_temp[alphabet[i]] = temp_keys[i]
     plaintext = decode(ciphertext, key_dict_temp)
-    fitness = calculate_fitness(plaintext, language=language, mode=mode)
+    try:
+        fitness = calculate_fitness(plaintext, language=language, mode=mode)
+    except Exception as exc:
+        print("{} : {}".format(exc, plaintext))
     return plaintext, fitness, temp_keys
 
 
