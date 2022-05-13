@@ -1,6 +1,8 @@
+import math
+
 from crypto_tools import data
-from crypto_tools.stats.letter_frequency import LetterFrequency
-from crypto_tools.stats.ngram_frequency import NgramFrequency
+from crypto_tools.stats.letter_frequency import LetterFrequency, LetterCounter
+from crypto_tools.stats.ngram_frequency import NgramFrequency, NgramCounter
 
 
 DIFF_AMPLIFICATION = 15
@@ -44,33 +46,20 @@ def fitness_aristocrat(text, language):
 
 
 def fitness_patristocrat(text, language):
-    lf = LetterFrequency(text).calculate()
-    bf = NgramFrequency(text=text, nvalue=2).calculate()
-    fitness = 0
-    for letter in lf:
-        if str(letter).isalpha():
-            fitness += abs(data.letter_frequency_by_language[language][letter] - lf[letter]) * DIFF_AMPLIFICATION
-    for bigram in bf:
-        if bigram not in data.bigram_frequency_by_language[language].keys():
-            fitness += bf[bigram] * DIFF_AMPLIFICATION
+    total = 0
+    lc = LetterCounter(text).count()
+    t4c = NgramCounter(text=text, nvalue=4, joined=True, lower=True).count()
+    # for letter in lc.keys():
+    #     if letter in data.letter_frequency_by_language[language]:
+    #         total += lc[letter] * math.log10(data.letter_frequency_by_language[language][letter])
+    for tetragram in t4c.keys():
+        if tetragram in data.tetragram_frequency_by_language[language].keys():
+            total += t4c[tetragram] * math.log10(data.tetragram_frequency_by_language[language][tetragram])
         else:
-            fitness += abs(data.bigram_frequency_by_language[language][bigram] - bf[bigram]) * DIFF_AMPLIFICATION
-    for index in range(len(text) - 1):
-        if text[index:index] in data.frequent_short_words_by_language[language][1]:
-            fitness -= 0.5
-    for index in range(len(text) - 2):
-        if text[index:index + 1] in data.frequent_short_words_by_language[language][2]:
-            fitness -= 0.5
-    for index in range(len(text) - 3):
-        if text[index:index + 2] in data.frequent_short_words_by_language[language][3]:
-            fitness -= 0.5
-    for index in range(len(text) - 4):
-        if text[index:index + 3] in data.frequent_short_words_by_language[language][4]:
-            fitness -= 0.5
-    for index in range(len(text) - 5):
-        if text[index:index + 4] in data.frequent_short_words_by_language[language][5]:
-            fitness -= 0.5
-    return fitness
+            total += t4c[tetragram] * math.log10(0.00000000000000000001)
+    if total == 0:
+        raise Exception("total 0?!?")
+    return abs(total / len(text))
 
 
 FITNESS_MODES = {
