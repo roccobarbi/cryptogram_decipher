@@ -40,9 +40,21 @@ def invert_list_elements(input_list, first, second):
     return output
 
 
+def all_different(key_a, key_b):
+    if len(key_b) != len(key_a):
+        raise Exception("Can't check if keys of different lenght are equal.")
+    for i in range(len(key_a)):
+        if key_a[i] == key_b[i]:
+            return False
+    return True
+
+
 def iteration(ciphertext, language, alphabet, key_list, mode):
-    first, second = extract_two(len(alphabet))
-    temp_keys = invert_list_elements(key_list, first, second)
+    while True:
+        first, second = extract_two(len(alphabet))
+        temp_keys = invert_list_elements(key_list, first, second)
+        if all_different(temp_keys, alphabet):
+            break
     key_dict_temp = {}
     for i in range(len(alphabet)):
         key_dict_temp[alphabet[i]] = temp_keys[i]
@@ -56,20 +68,28 @@ def iteration(ciphertext, language, alphabet, key_list, mode):
 
 def restart_cycle(ciphertext, alphabet, language, mode, iterations=ITERATIONS):
     key_list = list(alphabet)
-    random.shuffle(key_list)
+    while True:
+        random.shuffle(key_list)
+        if all_different(key_list, alphabet):
+            break
     key_dict = {}
     for i in range(len(alphabet)):
         key_dict[ALPHABET[i]] = key_list[i]
     plaintext = decode(ciphertext, key_dict)
     fitness = calculate_fitness(plaintext, language=language, mode=mode)
     changed = 0
+    unchanged = 0
     for i in range(iterations):
         text_temp, fitness_temp, key_list_temp = iteration(ciphertext, language, alphabet, key_list, mode)
+        unchanged += 1
         if fitness_temp < fitness:
             changed += 1
+            unchanged = 0
             plaintext = text_temp
             fitness = fitness_temp
             key_list = key_list_temp
+        if unchanged >= 100:
+            break
     print('Changed {} times'.format(changed))
     return plaintext, fitness
 

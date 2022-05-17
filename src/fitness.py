@@ -56,7 +56,7 @@ def fitness_patristocrat(text, language):
         if tetragram in data.tetragram_frequency_by_language[language].keys():
             total += t4c[tetragram] * math.log10(data.tetragram_frequency_by_language[language][tetragram])
         else:
-            total += t4c[tetragram] * math.log10(0.00000000000000000001)
+            total += t4c[tetragram] * math.log10(0.000000000000001)
     if total == 0:
         raise Exception("total 0?!?")
     return abs(total / len(text))
