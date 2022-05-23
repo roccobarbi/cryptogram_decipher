@@ -47,11 +47,18 @@ def fitness_aristocrat(text, language):
 
 def fitness_patristocrat(text, language):
     total = 0
+    fitness = 0
+    lf = LetterFrequency(text)
     lc = LetterCounter(text).count()
+    length = 0
     t4c = NgramCounter(text=text, nvalue=4, joined=True, lower=True).count()
-    # for letter in lc.keys():
-    #     if letter in data.letter_frequency_by_language[language]:
-    #         total += lc[letter] * math.log10(data.letter_frequency_by_language[language][letter])
+    letter_total_diff = 0
+    for letter in lf.calculate():
+        if str(letter) in lf.get_alphabet():
+            letter_diff = data.letter_frequency_by_language[language][letter] - lf.calculate()[letter]
+            letter_total_diff += abs(letter_diff) * lc[letter]
+            length += lc[letter]
+    fitness -= letter_total_diff / length
     for tetragram in t4c.keys():
         if tetragram in data.tetragram_frequency_by_language[language].keys():
             total += t4c[tetragram] * math.log10(data.tetragram_frequency_by_language[language][tetragram])
@@ -59,7 +66,8 @@ def fitness_patristocrat(text, language):
             total += t4c[tetragram] * math.log10(0.000000000000001)
     if total == 0:
         raise Exception("total 0?!?")
-    return abs(total / len(text))
+    fitness += abs(total / len(text))
+    return fitness
 
 
 FITNESS_MODES = {
